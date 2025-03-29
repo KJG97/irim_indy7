@@ -18,7 +18,7 @@ def reached_target_position(
     position_threshold: float = 0.02,
     command_name: str = "ee_pose",
     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
-    body_name: str = "panda_hand",
+    body_name: str = "tcp",
 ):
     """
     목표 위치에 도달했는지 확인하는 종료 조건

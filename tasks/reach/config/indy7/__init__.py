@@ -16,7 +16,7 @@ gym.register(
     id="Isaac-Reach-Indy7-IK-Rel-v0",
     entry_point="isaaclab.envs:ManagerBasedRLEnv",
     kwargs={
-        "env_cfg_entry_point": f"{__name__}.reach_ik_rel_env_cfg:Indy7ReachEnvCfg",
+        "env_cfg_entry_point": f"{__name__}.reach_ik_rel_env_cfg:INDY7ReachEnvCfg",
         "robomimic_bc_cfg_entry_point": os.path.join(agents.__path__[0], "robomimic/bc.json"),
     },
     disable_env_checker=True,

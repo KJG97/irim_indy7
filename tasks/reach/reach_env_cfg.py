@@ -9,12 +9,8 @@ import isaaclab.sim as sim_utils
 from isaaclab.assets import ArticulationCfg, AssetBaseCfg
 from isaaclab.envs import ManagerBasedRLEnvCfg
 from isaaclab.managers import ActionTermCfg as ActionTerm
-from isaaclab.managers import CurriculumTermCfg as CurrTerm
-from isaaclab.managers import EventTermCfg as EventTerm
 from isaaclab.managers import ObservationGroupCfg as ObsGroup
 from isaaclab.managers import ObservationTermCfg as ObsTerm
-from isaaclab.managers import RewardTermCfg as RewTerm
-from isaaclab.managers import SceneEntityCfg
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import FrameTransformerCfg
@@ -22,7 +18,7 @@ from isaaclab.utils import configclass
 from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 from isaaclab.utils.noise import AdditiveUniformNoiseCfg as Unoise
 
-import isaaclab_tasks.manager_based.manipulation.reach.mdp as mdp
+import irim_indy7.tasks.reach.mdp as mdp
 ##
 # Scene definition
 ##
@@ -40,15 +36,15 @@ class ReachSceneCfg(InteractiveSceneCfg):
     ground = AssetBaseCfg(
         prim_path="/World/ground",
         spawn=sim_utils.GroundPlaneCfg(),
-        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, -1.05)),
+        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0)),
     )
 
     table = AssetBaseCfg(
         prim_path="{ENV_REGEX_NS}/Table",
         spawn=sim_utils.UsdFileCfg(
-            usd_path=f"{ISAAC_NUCLEUS_DIR}/Props/Mounts/SeattleLabTable/table_instanceable.usd",
+            usd_path="/home/jkkim/IsaacLab/irim_indy7/asset/DESK_USD/URDF-PF-DESK.usd",
         ),
-        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.55, 0.0, 0.0), rot=(0.70711, 0.0, 0.0, 0.70711)),
+        init_state=AssetBaseCfg.InitialStateCfg(pos=(0.0, 0.0, 0.0), rot=(1.0, 0.0, 0.0, 0.0)),
     )
 
     # lights
@@ -116,7 +112,7 @@ class ObservationsCfg:
             func=mdp.observations.reached_target_position,
             params={
                 "position_threshold": 0.05,
-                "body_name": "panda_hand"
+                "body_name": "tcp"
             },
         )
 
@@ -140,7 +136,7 @@ class TerminationsCfg:
         func=mdp.terminations.reached_target_position, 
         params={
             "position_threshold": 0.05, 
-            "body_name": "panda_hand"  # 프랑카 로봇의 엔드 이펙터 이름
+            "body_name": "tcp"  # 프랑카 로봇의 엔드 이펙터 이름
         }
     )
 
@@ -160,6 +156,11 @@ class ReachEnvCfg(ManagerBasedRLEnvCfg):
     commands: CommandsCfg = CommandsCfg()
     # MDP settings
     terminations: TerminationsCfg = TerminationsCfg()
+
+    # Unused managers
+    rewards = None
+    events = None
+    curriculum = None
 
     def __post_init__(self):
         """Post initialization."""
