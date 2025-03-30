@@ -1,0 +1,8 @@
+pyproject.toml
+setup.py
+irim_assets/__init__.py
+irim_assets.egg-info/PKG-INFO
+irim_assets.egg-info/SOURCES.txt
+irim_assets.egg-info/dependency_links.txt
+irim_assets.egg-info/not-zip-safe
+irim_assets.egg-info/top_level.txt

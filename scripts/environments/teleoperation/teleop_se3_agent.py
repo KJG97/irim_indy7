@@ -6,12 +6,8 @@
 """Script to run a keyboard teleoperation with Isaac Lab manipulation environments."""
 
 """Launch Isaac Sim Simulator first."""
-
-
 import argparse
 import os
-import sys
-sys.path.append("/home/jkkim/IsaacLab")
 
 from isaaclab.app import AppLauncher
 
@@ -49,8 +45,7 @@ from isaaclab.envs import ViewerCfg
 from isaaclab.envs.ui import ViewportCameraController
 from isaaclab.managers import TerminationTermCfg as DoneTerm
 
-import isaaclab_tasks  # noqa: F401
-import irim_indy7
+import source.irim_tasks.irim_tasks  # noqa: F401
 from isaaclab_tasks.manager_based.manipulation.lift import mdp
 from isaaclab_tasks.utils import parse_env_cfg
 
