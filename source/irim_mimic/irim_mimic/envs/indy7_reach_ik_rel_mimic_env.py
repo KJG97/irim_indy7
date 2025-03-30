@@ -70,8 +70,6 @@ class INDY7ReachIKRelMimicEnv(ManagerBasedRLMimicEnv):
         delta_quat = PoseUtils.quat_from_matrix(delta_rot_mat)
         delta_rotation = PoseUtils.axis_angle_from_quat(delta_quat)
 
-        # get gripper action for single eef
-        (gripper_action,) = gripper_action_dict.values()
 
         # add noise to action
         pose_action = torch.cat([delta_position, delta_rotation], dim=0)
@@ -80,7 +78,7 @@ class INDY7ReachIKRelMimicEnv(ManagerBasedRLMimicEnv):
             pose_action += noise
             pose_action = torch.clamp(pose_action, -1.0, 1.0)
 
-        return torch.cat([pose_action, gripper_action], dim=0)
+        return pose_action
 
     def action_to_target_eef_pose(self, action: torch.Tensor) -> dict[str, torch.Tensor]:
         """
@@ -121,7 +119,6 @@ class INDY7ReachIKRelMimicEnv(ManagerBasedRLMimicEnv):
         target_poses = PoseUtils.make_pose(target_pos, target_rot).clone()
 
         return {eef_name: target_poses}
-
 
     def get_subtask_term_signals(self, env_ids: Sequence[int] | None = None) -> dict[str, torch.Tensor]:
         """

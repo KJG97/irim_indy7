@@ -64,12 +64,12 @@ class CommandsCfg:
     ee_pose = mdp.UniformPoseCommandCfg(
         asset_name="robot",
         body_name= "base_link",
-        resampling_time_range= (1000.0, 1000.0),#(4.0, 4.0),
+        resampling_time_range= (10.0, 10.0),
         debug_vis=True,
         ranges=mdp.UniformPoseCommandCfg.Ranges(
             pos_x=(0.35, 0.65),
-            pos_y=(0.0, 0.0),
-            pos_z=(0.35, 0.35),
+            pos_y=(-0.2, 0.2),
+            pos_z=(0.4, 0.4),
             roll=(0.0, 0.0),
             pitch=MISSING,  # depends on end-effector axis
             yaw=(-3.14, -3.14),
@@ -110,7 +110,7 @@ class ObservationsCfg:
         reached = ObsTerm(
             func=mdp.observations.reached_target_position,
             params={
-                "position_threshold": 0.01,
+                "position_threshold": 0.1,
                 "body_name": "tcp"
             },
         )
@@ -134,7 +134,7 @@ class TerminationsCfg:
     success = DoneTerm(
         func=mdp.terminations.reached_target_position, 
         params={
-            "position_threshold": 0.01, 
+            "position_threshold": 0.1, 
             "body_name": "tcp" 
         }
     )
