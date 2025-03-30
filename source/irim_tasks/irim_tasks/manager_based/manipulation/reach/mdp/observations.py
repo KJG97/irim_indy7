@@ -28,7 +28,7 @@ def ee_frame_quat(env: ManagerBasedRLEnv, robot_cfg: SceneEntityCfg = SceneEntit
 
 def reached_target_position(
     env: "ManagerBasedRLEnv",
-    position_threshold: float = 0.02,
+    position_threshold: float = 0.1,
     command_name: str = "ee_pose",
     asset_cfg: SceneEntityCfg = SceneEntityCfg("robot"),
     body_name: str = "tcp",
@@ -48,22 +48,26 @@ def reached_target_position(
     """
     # 로봇 객체 가져오기
     robot: Articulation = env.scene[asset_cfg.name]
+
+    # 로봇 베이스의 위치와 방향 가져오기
+    base_pos = robot.data.root_pos_w  # 베이스 위치
+    base_quat = robot.data.root_quat_w  # 베이스 방향 (쿼터니언)
     
     # 엔드 이펙터의 현재 위치 가져오기
     if body_name in robot.body_names:
         body_idx = robot.body_names.index(body_name)
-        current_position = robot.data.body_pos_w[:, body_idx]
+        tcp_world_pos = robot.data.body_pos_w[:, body_idx]
     else:
         raise ValueError(f"Body name '{body_name}' not found in robot asset.")
     
     # 목표 위치 가져오기 (command_manager 사용)
     command = env.command_manager.get_command(command_name)
     target_position = command[:, :3]
+    tcp_rel_pos = tcp_world_pos - base_pos  # 베이스 기준 TCP 상대 위치
     
     # 현재 위치와 목표 위치 간의 거리 계산
-    position_error = torch.norm(current_position - target_position, dim=1)
+    position_error = torch.norm(tcp_rel_pos - target_position, dim=1)
     
     # 거리가 임계값보다 작으면 성공으로 간주
     success = position_error < position_threshold
-    
     return success

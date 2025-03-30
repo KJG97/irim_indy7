@@ -7,8 +7,9 @@ import math
 
 from isaaclab.utils import configclass
 from isaaclab.managers import EventTermCfg as EventTerm
+from isaaclab.managers import SceneEntityCfg
 import source.irim_tasks.irim_tasks.manager_based.manipulation.reach.mdp as mdp
-from ...reach_env_cfg import ReachEnvCfg 
+from source.irim_tasks.irim_tasks.manager_based.manipulation.reach.reach_env_cfg import ReachEnvCfg 
 from isaaclab.sensors import FrameTransformerCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
 from source.irim_tasks.irim_tasks.manager_based.manipulation.reach.mdp import indy7_reach_events
@@ -26,6 +27,16 @@ class EventCfg:
         mode="startup",
         params={
             "default_pose": [0.0, 0.0, -1.57, 0.0, 1.57, 0.0],
+        },
+    )
+
+    randomize_indy7_joint_state = EventTerm(
+        func=indy7_reach_events.randomize_joint_by_gaussian_offset,
+        mode="reset",
+        params={
+            "mean": 0.0,
+            "std": 0.02,
+            "asset_cfg": SceneEntityCfg("robot"),
         },
     )
 
