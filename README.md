@@ -12,3 +12,8 @@ Record 실행 코드
 ./isaaclab.sh -p scripts/tools/record_demos.py --task Isaac-Reach-Indy7-IK-Rel-v0 --teleop_device vivetracker --dataset_file ./datasets/dataset.hdf5 --num_demos 10
 
 ```
+
+Generating demo Code
+```
+./isaaclab.sh -p scripts/imitation_learning/isaaclab_mimic/annotate_demos.py --input_file ./datasets/dataset.hdf5 --output_file ./datasets/annotated_dataset.hdf5 --task Isaac-Reach-Indy7-IK-Rel-Mimic-v0 --auto
+```

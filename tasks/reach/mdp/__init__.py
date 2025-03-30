@@ -4,9 +4,8 @@
 # SPDX-License-Identifier: BSD-3-Clause
 
 """This sub-module contains the functions that are specific to the locomotion environments."""
-
 from isaaclab.envs.mdp import *  # noqa: F401, F403
-
+from .indy7_reach_events import set_default_joint_pose
 from .terminations import *  # noqa: F401, F403
 from .observations import *  # noqa: F401, F403
 

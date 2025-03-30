@@ -64,7 +64,7 @@ class CommandsCfg:
 
     ee_pose = mdp.UniformPoseCommandCfg(
         asset_name="robot",
-        body_name=MISSING,
+        body_name= "base_link",
         resampling_time_range= (1000.0, 1000.0),#(4.0, 4.0),
         debug_vis=True,
         ranges=mdp.UniformPoseCommandCfg.Ranges(
@@ -111,7 +111,7 @@ class ObservationsCfg:
         reached = ObsTerm(
             func=mdp.observations.reached_target_position,
             params={
-                "position_threshold": 0.05,
+                "position_threshold": 0.1,
                 "body_name": "tcp"
             },
         )
@@ -135,8 +135,8 @@ class TerminationsCfg:
     success = DoneTerm(
         func=mdp.terminations.reached_target_position, 
         params={
-            "position_threshold": 0.05, 
-            "body_name": "tcp"  # 프랑카 로봇의 엔드 이펙터 이름
+            "position_threshold": 0.1, 
+            "body_name": "tcp" 
         }
     )
 

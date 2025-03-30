@@ -6,29 +6,40 @@
 import math
 
 from isaaclab.utils import configclass
-
-import isaaclab_tasks.manager_based.manipulation.reach.mdp as mdp
+from isaaclab.managers import EventTermCfg as EventTerm
+import irim_indy7.tasks.reach.mdp as mdp
 from ...reach_env_cfg import ReachEnvCfg 
 from isaaclab.sensors import FrameTransformerCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import OffsetCfg
-
-
+from irim_indy7.tasks.reach.mdp import indy7_reach_events
 ##
 # Pre-defined configs
 ##
 from isaaclab_assets import INDY7_CFG  # isort: skip
 
+@configclass
+class EventCfg:
+    """Configuration for events."""
+
+    init_indy7_arm_pose = EventTerm(
+        func=indy7_reach_events.set_default_joint_pose,
+        mode="startup",
+        params={
+            "default_pose": [0.0, 0.0, -1.57, 0.0, 1.57, 0.0],
+        },
+    )
 
 ##
 # Environment configuration
 ##
-
-
 @configclass
 class INDY7ReachEnvCfg(ReachEnvCfg):
     def __post_init__(self):
         # post init of parent
         super().__post_init__()
+        
+        # Set events
+        self.events = EventCfg()
 
         # switch robot to franka
         self.scene.robot = INDY7_CFG.replace(prim_path="{ENV_REGEX_NS}/Robot")
