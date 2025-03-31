@@ -43,11 +43,14 @@ async def run_data_generator(
             interpolate_from_last_target_pose=env.unwrapped.cfg.datagen_config.generation_interpolate_from_last_target_pose,
             pause_subtask=pause_subtask,
         )
+
         if bool(results["success"]):
             num_success += 1
         else:
             num_failures += 1
         num_attempts += 1
+
+    
 
 
 def env_loop(
@@ -70,7 +73,6 @@ def env_loop(
                 # an async-blocking call to get an action from a data generator
                 env_id, action = asyncio_event_loop.run_until_complete(env_action_queue.get())
                 actions[env_id] = action
-
             # perform action on environment
             env.step(actions)
 
