@@ -50,10 +50,11 @@ import random
 import torch
 
 import source.irim_mimic.irim_mimic.envs  # noqa: F401
+import source.irim_tasks.irim_tasks  # noqa: F401
+
 from source.irim_mimic.irim_mimic.datagen.generation import env_loop, setup_async_generation, setup_env_config
 from source.irim_mimic.irim_mimic.datagen.utils import get_env_name_from_dataset, setup_output_paths
 
-import source.irim_tasks.irim_tasks  # noqa: F401
 
 
 def main():

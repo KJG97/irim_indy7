@@ -37,7 +37,7 @@ class INDY7ReachIKRelMimicEnvCfg(INDY7ReachEnvCfg, MimicEnvCfg):
                 # 선택 전략 함수의 선택적 매개변수
                 selection_strategy_kwargs={},
                 # 이 서브태스크 동안 적용할 액션 노이즈 양
-                action_noise=0.0,
+                action_noise=0.03,
                 # 이 서브태스크 세그먼트로 연결하기 위한 보간 단계 수
                 num_interpolation_steps=5,
                 # 로봇이 필요한 자세에 도달하기 위한 추가 고정 단계

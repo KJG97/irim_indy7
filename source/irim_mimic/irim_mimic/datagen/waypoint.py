@@ -401,8 +401,8 @@ class WaypointTrajectory:
                 # step environment
                 if not isinstance(play_action, torch.Tensor):
                     play_action = torch.tensor(play_action)
-                if play_action.dim() == 1 and play_action.size(0) == 7:
-                    play_action = play_action.unsqueeze(0)  # Reshape to [1, 7]
+                if play_action.dim() == 1 and play_action.size(0) == 6:
+                    play_action = play_action.unsqueeze(0)  # Reshape to [1, 6]
 
                 if env_action_queue is None:
                     obs, _, _, _, _ = env.step(play_action)

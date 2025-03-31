@@ -40,6 +40,7 @@ import robomimic.utils.file_utils as FileUtils
 import robomimic.utils.torch_utils as TorchUtils
 
 from isaaclab_tasks.utils import parse_env_cfg
+import source.irim_tasks.irim_tasks  # noqa: F401
 
 
 def rollout(policy, env, horizon, device):
