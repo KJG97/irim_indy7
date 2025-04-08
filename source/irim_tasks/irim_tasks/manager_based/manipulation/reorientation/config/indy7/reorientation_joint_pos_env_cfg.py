@@ -50,7 +50,7 @@ class EventCfg:
         func=indy7_reorientation_events.randomize_object_pose,
         mode="reset",
         params={
-            "pose_range": {"x": (0.4, 0.6), "y": (-0.10, 0.10), "z": (0.866, 0.866), "yaw": (-1.0, 1, 0)},
+            "pose_range": {"x": (0.1, 0.4), "y": (-0.2, 0.2), "z": (0.866, 0.866), "yaw": (-3.14, 3.14, 0)},
             "min_separation": 0.1,
             "asset_cfgs": [SceneEntityCfg("Tcube")],
         },
@@ -94,7 +94,7 @@ class Indy7ReorientationEnvCfg(ReorientationEnvCfg):
         # Set each stacking cube deterministically
         self.scene.Tcube = RigidObjectCfg(
             prim_path="{ENV_REGEX_NS}/Tcube",
-            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.4, 0.0, 0.866], rot=[1, 0, 0, 0]),
+            init_state=RigidObjectCfg.InitialStateCfg(pos=[0.0, 0.0, 0.866], rot=[1, 0, 0, 0]),
             spawn=UsdFileCfg(
                 usd_path=f"/home/jkkim/IsaacLab/irim_indy7/asset/Tcube_USD/Tcube.usd",
                 scale=(1.0, 1.0, 1.0),

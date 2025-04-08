@@ -91,14 +91,51 @@ class DataGenInfoPool:
         # extract datagen info
         if "datagen_info" in ep_grp["obs"]:
             eef_pose = ep_grp["obs"]["datagen_info"]["eef_pose"][eef_name]
+            # 아래와 같이 수정: object_pose 키가 없으면 빈 딕셔너리 사용
+            if "object_pose" in ep_grp["obs"]["datagen_info"]:
+                object_poses_dict = ep_grp["obs"]["datagen_info"]["object_pose"]
+            else:
+                # Reach 태스크에는 물체가 없으므로 빈 딕셔너리 사용
+                object_poses_dict = {}
             target_eef_pose = ep_grp["obs"]["datagen_info"]["target_eef_pose"][eef_name]
             subtask_term_signals_dict = ep_grp["obs"]["datagen_info"]["subtask_term_signals"]
-        
+
+        else:
+            # Extract eef poses
+            eef_pos = ep_grp["obs"]["eef_pos"]
+            eef_quat = ep_grp["obs"]["eef_quat"]  # format (w, x, y, z)
+            eef_rot_matrices = PoseUtils.matrix_from_quat(eef_quat)  # shape (N, 3, 3)
+            # Create pose matrices for all environments
+            eef_pose = PoseUtils.make_pose(eef_pos, eef_rot_matrices)  # shape (N, 4, 4)
+
+            # Object poses
+            object_poses_dict = dict()
+            for object_name, value in ep_grp["obs"]["object_pose"].items():
+                # object_pose
+                value = value["root_pose"]
+                # Root state ``[pos, quat, lin_vel, ang_vel]`` in simulation world frame. Shape is (num_steps, 13).
+                # Quaternion ordering is wxyz
+
+                # Convert to rotation matrices
+                object_rot_matrices = PoseUtils.matrix_from_quat(value[:, 3:7])  # shape (N, 3, 3)
+                object_rot_positions = value[:, 0:3]  # shape (N, 3)
+                object_poses_dict[object_name] = PoseUtils.make_pose(object_rot_positions, object_rot_matrices)
+
+            # Target eef pose
+            target_eef_pose = ep_grp["obs"]["target_eef_pose"]
+
+            # Subtask termination signalsS
+            subtask_term_signals_dict = (ep_grp["obs"]["subtask_term_signals"],)
+
         # Extract gripper actions
+        gripper_actions = self.env.actions_to_gripper_actions(ep_grp["actions"])[eef_name]
+
         ep_datagen_info_obj = DatagenInfo(
             eef_pose=eef_pose,
+            object_poses=object_poses_dict,
             subtask_term_signals=subtask_term_signals_dict,
             target_eef_pose=target_eef_pose,
+            gripper_action=gripper_actions,
         )
         self._datagen_infos.append(ep_datagen_info_obj)
 

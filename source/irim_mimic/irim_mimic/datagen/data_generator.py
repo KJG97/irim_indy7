@@ -13,9 +13,9 @@ import torch
 import isaaclab.utils.math as PoseUtils
 from isaaclab.envs.mimic_env_cfg import MimicEnvCfg
 
-from source.irim_mimic.irim_mimic.datagen.datagen_info import DatagenInfo
-from source.irim_mimic.irim_mimic.datagen.selection_strategy import make_selection_strategy
-from source.irim_mimic.irim_mimic.datagen.waypoint import WaypointSequence, WaypointTrajectory
+from isaaclab_mimic.datagen.datagen_info import DatagenInfo
+from isaaclab_mimic.datagen.selection_strategy import make_selection_strategy
+from isaaclab_mimic.datagen.waypoint import WaypointSequence, WaypointTrajectory
 
 from .datagen_info_pool import DataGenInfoPool
 
@@ -173,12 +173,7 @@ class DataGenerator:
                     # subtask termination signal is unused
                     subtask_term_signals=None,
                     target_eef_pose=src_ep_datagen_info.target_eef_pose[subtask_start_ind:subtask_end_ind],
-                    gripper_action=(
-                        src_ep_datagen_info.gripper_action[subtask_start_ind:subtask_end_ind]
-                        if src_ep_datagen_info.gripper_action is not None
-                        else torch.zeros((subtask_end_ind - subtask_start_ind,), dtype=torch.float, device=self.env.device)
-                    ),
-
+                    gripper_action=src_ep_datagen_info.gripper_action[subtask_start_ind:subtask_end_ind],
                 )
             )
 
@@ -323,18 +318,9 @@ class DataGenerator:
             src_subtask_target_poses = src_ep_datagen_info.target_eef_pose[
                 selected_src_subtask_inds[0] : selected_src_subtask_inds[1]
             ]
-            # 그리퍼 액션 처리 추가
-            if src_ep_datagen_info.gripper_action is not None:
-                src_subtask_gripper_actions = src_ep_datagen_info.gripper_action[
-                    selected_src_subtask_inds[0] : selected_src_subtask_inds[1]
-                ]
-            else:
-                # 더미 그리퍼 액션 생성
-                src_subtask_gripper_actions = torch.zeros(
-                    (selected_src_subtask_inds[1] - selected_src_subtask_inds[0],), 
-                    dtype=torch.float, 
-                    device=self.env.device
-                )
+            src_subtask_gripper_actions = src_ep_datagen_info.gripper_action[
+                selected_src_subtask_inds[0] : selected_src_subtask_inds[1]
+            ]
 
             # get reference object pose from source demo
             src_subtask_object_pose = (
@@ -377,21 +363,19 @@ class DataGenerator:
                 init_sequence = WaypointSequence(sequence=[last_waypoint])
             else:
                 # Interpolation segment will start from current robot eef pose.
-                dummy_gripper_action = torch.zeros((1,), dtype=torch.float, device=self.env.device)
                 init_sequence = WaypointSequence.from_poses(
                     eef_names=eef_names,
                     poses=self.env.get_robot_eef_pose(eef_name, env_ids=[env_id])[0][None],
-                    gripper_actions=dummy_gripper_action.unsqueeze(0),  # 더미 그리퍼 액션 사용
+                    gripper_actions=src_subtask_gripper_actions[0:1],
                     action_noise=self.subtask_configs[subtask_ind].action_noise,
                 )
             traj_to_execute.add_waypoint_sequence(init_sequence)
 
             # Construct trajectory for the transformed segment.
-            dummy_gripper_actions = torch.zeros(transformed_eef_poses.shape[0], dtype=torch.float, device=self.env.device)
             transformed_seq = WaypointSequence.from_poses(
                 eef_names=eef_names,
                 poses=transformed_eef_poses,
-                gripper_actions=dummy_gripper_actions,
+                gripper_actions=src_subtask_gripper_actions,
                 action_noise=self.subtask_configs[subtask_ind].action_noise,
             )
             transformed_traj = WaypointTrajectory()

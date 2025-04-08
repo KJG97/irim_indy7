@@ -14,7 +14,7 @@ from __future__ import annotations
 import torch
 from typing import TYPE_CHECKING
 
-from isaaclab.assets import Articulation, RigidObject
+from isaaclab.assets import RigidObject
 from isaaclab.managers import SceneEntityCfg
 
 if TYPE_CHECKING:
@@ -50,7 +50,8 @@ def object_reoriented(
 
     # 1. xy 좌표가 (0,0)에 가까운지 확인
     xy_pos = object_pos[:, :2]  # x,y 좌표만 선택
-    distance_from_center = torch.linalg.vector_norm(xy_pos, dim=1)
+    target_pos = torch.tensor([0.1, 0.0], device=env.device)
+    distance_from_center = torch.linalg.vector_norm(xy_pos - target_pos, dim=1)
     is_centered = distance_from_center < position_threshold
     
     # 2. 방향이 (1,0,0,0)에 가까운지 확인
@@ -61,7 +62,9 @@ def object_reoriented(
     quat_dot_product = torch.abs(torch.sum(object_quat * target_quat, dim=1))
     quat_distance = 1.0 - quat_dot_product  # 0이면 완전히 일치, 2이면 완전히 반대
     is_aligned = quat_distance < orientation_threshold
-    
+    # print(f"{distance_from_center.item():.4f}, {quat_distance.item():.4f}")
+    # print(f"is_centered: {is_centered.item()}, is_aligned: {is_aligned.item()} \n")
+
     # 두 조건 모두 만족하는지 확인
     is_reoriented = torch.logical_and(is_centered, is_aligned)
     

@@ -106,9 +106,8 @@ class RateLimiter:
 def pre_process_actions(delta_pose: torch.Tensor, gripper_command: bool) -> torch.Tensor:
     """Pre-process actions for the environment."""
     # compute actions based on environment
-    if "Reach" in args_cli.task:
-        # note: reach is the only one that uses a different action space
-        # compute actions
+    if "Reach" in args_cli.task or "Reorientation" in args_cli.task:
+        # 그리퍼가 필요 없는 작업에는 delta_pose만 반환
         return delta_pose
     else:
         # resolve gripper command

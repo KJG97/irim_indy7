@@ -108,6 +108,11 @@ def randomize_object_pose(
 ):
     if env_ids is None:
         return
+    
+    # extras 딕셔너리에 initial_Tcube_pos가 없으면 초기화
+    if "initial_Tcube_pos" not in env.extras:
+        env.extras["initial_Tcube_pos"] = torch.zeros((env.num_envs, 3), device=env.device)
+
 
     # Randomize poses in each environment independently
     for cur_env in env_ids.tolist():
@@ -127,6 +132,11 @@ def randomize_object_pose(
             pose_tensor = torch.tensor([pose_list[i]], device=env.device)
             positions = pose_tensor[:, 0:3] + env.scene.env_origins[cur_env, 0:3]
             orientations = math_utils.quat_from_euler_xyz(pose_tensor[:, 3], pose_tensor[:, 4], pose_tensor[:, 5])
+            
+            # 초기 위치 저장 (asset_cfg.name이 "Tcube"일 때)
+            if asset_cfg.name == "Tcube":
+                env.extras["initial_Tcube_pos"][cur_env] = positions[0]
+            
             asset.write_root_pose_to_sim(
                 torch.cat([positions, orientations], dim=-1), env_ids=torch.tensor([cur_env], device=env.device)
             )

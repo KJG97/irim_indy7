@@ -73,16 +73,31 @@ def object_touch(
     # 오브젝트 가져오기
     object: RigidObject = env.scene[object_cfg.name]
 
-    # 오브젝트와 엔드 이펙터의 위치 가져오기
-    object_pos = object.data.root_pos_w
-    end_effector_pos = ee_frame.data.target_pos_w[:, 0, :]
+    # 저장된 초기 Tcube 위치 가져오기
+    if "initial_Tcube_pos" not in env.extras:
+         # 초기화되지 않은 경우 경고 또는 오류 처리 (혹은 기본값 설정)
+         print("Warning: initial_Tcube_pos not found in env.extras. Returning False.")
+         return torch.zeros(env.num_envs, dtype=torch.bool, device=env.device)
+
+    # object_initial_pos 텐서 가져오기 (Shape: [num_envs, 3])
+    object_initial_pos = env.extras["initial_Tcube_pos"]
+
+    # 현재 엔드 이펙터 위치 가져오기
+    end_effector_pos = ee_frame.data.target_pos_w[:, 0, :] # Shape: [num_envs, 3]
     
-    # 두 물체 사이의 거리 계산
-    distance = torch.linalg.vector_norm(object_pos - end_effector_pos, dim=1)
+    # z축 방향 단위 벡터 생성
+    z_offset = torch.zeros_like(end_effector_pos)
+    z_offset[:, 2] = 0.20  
+    
+    # 오프셋이 적용된 엔드 이펙터 위치 계산
+    adjusted_end_effector_pos = end_effector_pos - z_offset
+    
+    # 두 물체 사이의 거리 계산 (수정된 위치 사용)
+    distance = torch.linalg.vector_norm(object_initial_pos - adjusted_end_effector_pos, dim=1)
     
     # 거리가 임계값보다 작으면 접촉으로 간주
     touched = distance < touch_threshold
-    
+
     return touched
 
 def object_center(

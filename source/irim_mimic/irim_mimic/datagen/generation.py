@@ -12,10 +12,10 @@ from isaaclab.envs import ManagerBasedEnv
 from isaaclab.envs.mdp.recorders.recorders_cfg import ActionStateRecorderManagerCfg
 from isaaclab.managers import DatasetExportMode
 
-from .data_generator import DataGenerator
-from .datagen_info_pool import DataGenInfoPool
+from source.irim_mimic.irim_mimic.datagen.data_generator import DataGenerator
+from source.irim_mimic.irim_mimic.datagen.datagen_info_pool import DataGenInfoPool
 
-from source.irim_tasks.irim_tasks.utils.parse_cfg import parse_env_cfg
+from isaaclab_tasks.utils.parse_cfg import parse_env_cfg
 
 # global variable to keep track of the data generation statistics
 num_success = 0
@@ -43,14 +43,11 @@ async def run_data_generator(
             interpolate_from_last_target_pose=env.unwrapped.cfg.datagen_config.generation_interpolate_from_last_target_pose,
             pause_subtask=pause_subtask,
         )
-
         if bool(results["success"]):
             num_success += 1
         else:
             num_failures += 1
         num_attempts += 1
-
-    
 
 
 def env_loop(
@@ -66,13 +63,15 @@ def env_loop(
     with contextlib.suppress(KeyboardInterrupt) and torch.inference_mode():
         while True:
 
-            actions = torch.zeros(env.unwrapped.action_space.shape)
+            desired_action_dim = 6  # 실제 사용하려는 액션 차원 (예: 6)
+            num_envs = env.unwrapped.num_envs
+            actions = torch.zeros(num_envs, desired_action_dim)
 
             # get actions from all the data generators
             for i in range(env.unwrapped.num_envs):
                 # an async-blocking call to get an action from a data generator
                 env_id, action = asyncio_event_loop.run_until_complete(env_action_queue.get())
-                actions[env_id] = action
+                actions[env_id] = action[:desired_action_dim]
             # perform action on environment
             env.step(actions)
 

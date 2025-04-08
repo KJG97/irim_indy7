@@ -13,7 +13,6 @@ from isaaclab.scene import InteractiveSceneCfg
 from isaaclab.sensors.frame_transformer.frame_transformer_cfg import FrameTransformerCfg
 from isaaclab.sim.spawners.from_files.from_files_cfg import GroundPlaneCfg, UsdFileCfg
 from isaaclab.utils import configclass
-from isaaclab.utils.assets import ISAAC_NUCLEUS_DIR
 from . import mdp
 
 ##
@@ -91,14 +90,7 @@ class ObservationsCfg:
             params={
                 "ee_frame_cfg": SceneEntityCfg("ee_frame"),
                 "object_cfg": SceneEntityCfg("Tcube"),
-                "touch_threshold": 0.03,
-            },
-        )
-        center = ObsTerm(
-            func=mdp.object_center,
-            params={
-                "object_cfg": SceneEntityCfg("Tcube"),
-                "position_threshold": 0.05,
+                "touch_threshold": 0.1,
             },
         )
 
@@ -120,7 +112,14 @@ class TerminationsCfg:
         func=mdp.root_height_below_minimum, params={"minimum_height": -0.05, "asset_cfg": SceneEntityCfg("Tcube")}
     )
 
-    success = DoneTerm(func=mdp.object_reoriented)
+    success = DoneTerm(
+        func=mdp.object_reoriented, 
+        params={
+            "object_cfg": SceneEntityCfg("Tcube"),
+            "position_threshold": 0.01,  # 적절한 값으로 설정 (선택 사항)
+            "orientation_threshold": 0.005  # 적절한 값으로 설정 (선택 사항)
+        }
+    )
 
 @configclass
 class ReorientationEnvCfg(ManagerBasedRLEnvCfg):

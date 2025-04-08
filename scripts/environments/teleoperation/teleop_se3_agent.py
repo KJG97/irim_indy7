@@ -53,9 +53,8 @@ from isaaclab_tasks.utils import parse_env_cfg
 def pre_process_actions(delta_pose: torch.Tensor, gripper_command: bool) -> torch.Tensor:
     """Pre-process actions for the environment."""
     # compute actions based on environment
-    if "Reach" in args_cli.task:
-        # note: reach is the only one that uses a different action space
-        # compute actions
+    if "Reach" in args_cli.task or "Reorientation" in args_cli.task:
+        # 그리퍼가 필요 없는 작업에는 delta_pose만 반환
         return delta_pose
     else:
         # resolve gripper command
@@ -116,7 +115,7 @@ def main():
         ViewportCameraController(env, viewer)
     elif args_cli.teleop_device.lower() == "vivetracker":
         teleop_interface = Se3ViveTracker(
-                pos_scale= 3 * args_cli.sensitivity, rot_scale= 3 * args_cli.sensitivity, 
+                pos_scale= 2 * args_cli.sensitivity, rot_scale= 0.1 * args_cli.sensitivity, 
                 device_key="tracker"
             )
         teleop_interface.add_callback("R", env.reset)
