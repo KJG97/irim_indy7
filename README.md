@@ -1,5 +1,14 @@
 # irim_indy7
 
+가상환경 접속
+```
+conda activate env_isaaclab
+```
+
+경로 접속
+```
+cd IsaacLab/irim_indy7/
+```
 Teleoperation 실행 코드
 
 ```
